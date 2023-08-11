@@ -18,14 +18,14 @@ func DefaultProvider() container.ProviderContainer {
 }
 
 type Config struct {
-	ClusterName string
+	ClusterName *string
 	Addresses   []string
 	Password    string
 	DB          uint
 }
 
 func (c *Config) IsClusterMode() bool {
-	return c.ClusterName == ""
+	return c.ClusterName == nil
 }
 
 func (c *Config) ToRedisOptions() *redis.Options {
@@ -38,7 +38,7 @@ func (c *Config) ToRedisOptions() *redis.Options {
 
 func (c *Config) ToRedisClusterOptions() *redis.ClusterOptions {
 	return &redis.ClusterOptions{
-		ClientName: c.ClusterName,
+		ClientName: *c.ClusterName,
 		Addrs:      c.Addresses,
 		Password:   c.Password,
 	}
