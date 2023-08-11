@@ -1,8 +1,6 @@
 package redis
 
 import (
-	"fmt"
-
 	"github.com/redis/go-redis/v9"
 	"github.com/rogeecn/atom/container"
 	"github.com/rogeecn/atom/utils/opt"
@@ -21,15 +19,18 @@ func DefaultProvider() container.ProviderContainer {
 
 type Config struct {
 	ClusterName string
-	Host        string
-	Port        uint
+	Addresses   []string
 	Password    string
 	DB          uint
 }
 
+func (c *Config) IsClusterMode() bool {
+	return c.ClusterName == ""
+}
+
 func (c *Config) ToRedisOptions() *redis.Options {
 	return &redis.Options{
-		Addr:     fmt.Sprintf("%s:%d", c.Host, c.Port),
+		Addr:     c.Addresses[0],
 		Password: c.Password,
 		DB:       int(c.DB),
 	}
@@ -38,7 +39,7 @@ func (c *Config) ToRedisOptions() *redis.Options {
 func (c *Config) ToRedisClusterOptions() *redis.ClusterOptions {
 	return &redis.ClusterOptions{
 		ClientName: c.ClusterName,
-		Addrs:      []string{fmt.Sprintf("%s:%d", c.Host, c.Port)},
+		Addrs:      c.Addresses,
 		Password:   c.Password,
 	}
 }
