@@ -25,7 +25,7 @@ type Config struct {
 }
 
 func (c *Config) IsClusterMode() bool {
-	return c.ClusterName == nil
+	return c.ClusterName != nil
 }
 
 func (c *Config) ToRedisOptions() *redis.Options {
@@ -37,9 +37,12 @@ func (c *Config) ToRedisOptions() *redis.Options {
 }
 
 func (c *Config) ToRedisClusterOptions() *redis.ClusterOptions {
-	return &redis.ClusterOptions{
-		ClientName: *c.ClusterName,
-		Addrs:      c.Addresses,
-		Password:   c.Password,
+	options := &redis.ClusterOptions{
+		Addrs:    c.Addresses,
+		Password: c.Password,
 	}
+	if c.ClusterName != nil {
+		options.ClientName = *c.ClusterName
+	}
+	return options
 }
